@@ -2,6 +2,7 @@ package com.example.bulletinboard
 
 import android.os.Bundle
 import android.view.MenuItem
+import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.app.AppCompatActivity
@@ -10,11 +11,16 @@ import com.example.bulletinboard.databinding.ActivityMainBinding
 import com.example.bulletinboard.dialogs.DialogHelper
 import com.google.android.material.navigation.NavigationView.OnNavigationItemSelectedListener
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseUser
 
 class MainActivity : AppCompatActivity(), OnNavigationItemSelectedListener {
 
     private var _binding: ActivityMainBinding? = null
     private val binding get() = _binding!!
+
+    private val tvAccount by lazy {
+        binding.navView.getHeaderView(0).findViewById<TextView>(R.id.usersEmail)
+    }
 
     private val dialogHelper = DialogHelper(this)
     val mAuth = FirebaseAuth.getInstance()
@@ -24,6 +30,11 @@ class MainActivity : AppCompatActivity(), OnNavigationItemSelectedListener {
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         init()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        uiUpdate(mAuth.currentUser)
     }
 
     private fun init() {
@@ -39,6 +50,7 @@ class MainActivity : AppCompatActivity(), OnNavigationItemSelectedListener {
         binding.drawerLayout.addDrawerListener(toggle)
         toggle.syncState()
         binding.navView.setNavigationItemSelectedListener(this)
+
     }
 
 
@@ -73,21 +85,22 @@ class MainActivity : AppCompatActivity(), OnNavigationItemSelectedListener {
 
             R.id.id_sign_in -> {
                 dialogHelper.createSignDialog(DialogHelper.SIGN_IN)
-                Toast.makeText(this, item.title, Toast.LENGTH_LONG).show()
             }
 
             R.id.id_sign_out -> {
-                Toast.makeText(this, item.title, Toast.LENGTH_LONG).show()
+                uiUpdate(null)
+                mAuth.signOut()
             }
 
             R.id.id_sign_up -> {
                 dialogHelper.createSignDialog(DialogHelper.SIGN_UP)
-                Toast.makeText(this, item.title, Toast.LENGTH_LONG).show()
             }
         }
         binding.drawerLayout.closeDrawer(GravityCompat.START)
         return true
+    }
 
-
+    fun uiUpdate(user: FirebaseUser?){
+        tvAccount.text = if (user == null) getString(R.string.not_reg) else user.email
     }
 }
