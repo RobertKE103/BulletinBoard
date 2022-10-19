@@ -15,5 +15,9 @@
 
     <string name="open">Open</string>
     <string name="close">Close</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="sign_z">Зарегистрироваться</string>
+    <string name="password_help">Забыли пароль</string>
 
 </resources>
